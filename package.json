@@ -6,10 +6,10 @@
   "repository": "git@github.com:gasandov/scraping-tools.git",
   "author": "Germán Sandoval <german.sandoval.ie@gmail.com>",
   "license": "MIT",
+  "type": "module",
   "private": false,
   "scripts": {
-    "usvisa": "ts-node src/usvisa.ts",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint . --ext .js",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "prepare": "husky install"
@@ -19,15 +19,9 @@
     "puppeteer": "^19.7.3"
   },
   "devDependencies": {
-    "@types/node": "^18.14.6",
-    "@types/puppeteer": "^7.0.4",
-    "@typescript-eslint/eslint-plugin": "^5.54.1",
-    "@typescript-eslint/parser": "^5.54.1",
     "eslint": "^8.35.0",
     "eslint-config-prettier": "^8.7.0",
     "husky": "^8.0.0",
-    "prettier": "^2.8.4",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.9.5"
+    "prettier": "^2.8.4"
   }
 }

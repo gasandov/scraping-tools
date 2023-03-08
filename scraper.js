@@ -1,4 +1,4 @@
-import { Browser, Page } from "puppeteer";
+import { ElementHandle, Browser, Page } from "puppeteer";
 
 export class Scraper {
   #browser;
@@ -73,20 +73,60 @@ export class Scraper {
   async verifyLoginStatus(signedInPath, invalidCredsPath) {
     await this.sleep(1000);
 
-    const invalidCreds = (await this.page.$x(invalidCredsPath)) || [];
+    await this.doesElementExist({
+      path: invalidCredsPath,
+      shouldExist: false,
+      errMsg: "Invalid credentials",
+    });
 
-    if (invalidCreds.length > 0) {
-      throw new Error("Invalid credentials");
-    }
+    await this.page.waitForNavigation({ waitUntil: "networkidle0" });
 
-    this.page.waitForNavigation({ waitUntil: "networkidle0" });
-
-    const signedIn = (await this.page.$x(signedInPath)) || [];
-
-    if (signedIn.length === 0) {
-      throw new Error("Login process failed");
-    }
+    await this.doesElementExist({
+      path: signedInPath,
+      shouldExist: true,
+      errMsg: "Login process failed",
+    });
 
     console.info("Login process completed successfully");
+  }
+
+  /**
+   * @description Clicks on the specified element
+   * @param {xpath} path
+   * @param {boolean} evaluate
+   * @returns {Promise<void>}
+   */
+  async click(path, evaluate = false) {
+    const [button] = await this.page.$x(path);
+
+    if (evaluate) {
+      return await button.evaluate((btn) => btn.click());
+    }
+
+    await button.click();
+  }
+
+  /**
+   * @param {xpath} path
+   */
+  async selectDropdownOption(path) {}
+
+  /**
+   *
+   * @param {*} param0
+   * @returns {ElementHandle}
+   */
+  async doesElementExist({ path, errMsg, shouldExist }) {
+    const element = (await this.page.$x(path)) || [];
+
+    if (shouldExist === true && element.length === 0) {
+      throw new Error(errMsg);
+    }
+
+    if (shouldExist === false && element.length > 0) {
+      throw new Error(errMsg);
+    }
+
+    return element[0];
   }
 }

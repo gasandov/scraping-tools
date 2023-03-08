@@ -1,16 +1,8 @@
 import { launch } from "puppeteer";
 
-import config from "../config/vars.js";
+import config from "./vars.js";
+import { xpaths } from "./utils.js";
 import { Scraper } from "../../scraper.js";
-
-const xpaths = {
-  usernameInput: '//input[@id="user_email"]',
-  passwordInput: '//input[@id="user_password"]',
-  policyCheckbox: '//input[@id="policy_confirmed"]',
-  loginButton: '//input[@type="submit"]',
-  signedIn: '(//a[@href="/es-mx/niv/users/sign_out"])[1]',
-  invalidCredentials: '//p[contains(@class, "error")]',
-};
 
 /**
  * @description Logs in to the US Visa website
@@ -32,11 +24,8 @@ async function login(page, username, password) {
 }
 
 (async () => {
-  const { usvisa } = config;
-
   const browser = await launch({ headless: false });
   const scraper = new Scraper(browser);
-
   const signInPage = "https://ais.usvisa-info.com/es-mx/niv/users/sign_in";
 
   await scraper.init();
@@ -44,7 +33,25 @@ async function login(page, username, password) {
 
   const page = scraper.get();
 
-  await login(page, usvisa.username, usvisa.password);
+  await login(page, config.username, config.password);
 
+  // verify if login was successful
   await scraper.verifyLoginStatus(xpaths.signedIn, xpaths.invalidCredentials);
+
+  // click on appointment based on scheduleId and wait for page to load
+  await scraper.click(xpaths.continueWithAppoinmentButton, true);
+  await page.waitForNavigation({ waitUntil: "networkidle0" });
+
+  // click on "reschdule" button and wait for page to load
+  await scraper.click(xpaths.reScheduleButton, true);
+  await page.waitForNavigation({ waitUntil: "networkidle0" });
+
+  // verify if there are no appointments available
+  await scraper.doesElementExist({
+    path: xpaths.noAppointmentsAvailable,
+    errMsg: "No hay citas disponibles",
+    shouldExist: false,
+  });
+
+  // TODO: select consulate facility
 })();

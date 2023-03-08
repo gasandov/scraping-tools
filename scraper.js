@@ -5,6 +5,7 @@ export class Scraper {
   page;
 
   /**
+   * @description Creates a new instance of the Scraper class
    * @param {Browser} browser
    */
   constructor(browser) {
@@ -12,6 +13,7 @@ export class Scraper {
   }
 
   /**
+   * @description Returns the page property
    * @returns {Page}
    */
   get() {
@@ -19,6 +21,7 @@ export class Scraper {
   }
 
   /**
+   * @decription Creates a new page and assigns it to the page property
    * @returns {Promise<void>}
    */
   async init() {
@@ -26,6 +29,7 @@ export class Scraper {
   }
 
   /**
+   * @description Closes the browser, ending the session
    * @returns {Promise<void>}
    */
   async close() {
@@ -33,6 +37,7 @@ export class Scraper {
   }
 
   /**
+   * @description Navigates to the specified URL
    * @returns {Promise<void>}
    * @param {string} url
    */
@@ -41,10 +46,47 @@ export class Scraper {
   }
 
   /**
+   * @description Waits for the specified time
+   * @returns {Promise<void>}
+   * @param {number} time
+   */
+  async sleep(time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+  }
+
+  /**
+   * @description Takes a screenshot of the current page
    * @returns {Promise<void>}
    * @param {string} filename
    */
   async takeScreenshot(filename) {
     await this.page.screenshot({ path: filename });
+  }
+
+  /**
+   * @description Verifies the login status, either by checking valid credentials
+   *  or by looking for the "signed in" element
+   * @returns {Promise<void>}
+   * @param {string} signedInPath
+   * @param {string} invalidCredsPath
+   */
+  async verifyLoginStatus(signedInPath, invalidCredsPath) {
+    await this.sleep(1000);
+
+    const invalidCreds = (await this.page.$x(invalidCredsPath)) || [];
+
+    if (invalidCreds.length > 0) {
+      throw new Error("Invalid credentials");
+    }
+
+    this.page.waitForNavigation({ waitUntil: "networkidle0" });
+
+    const signedIn = (await this.page.$x(signedInPath)) || [];
+
+    if (signedIn.length === 0) {
+      throw new Error("Login process failed");
+    }
+
+    console.info("Login process completed successfully");
   }
 }

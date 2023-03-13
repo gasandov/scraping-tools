@@ -38,8 +38,8 @@ export class Scraper {
 
   /**
    * @description Navigates to the specified URL
-   * @returns {Promise<void>}
    * @param {string} url
+   * @returns {Promise<void>}
    */
   async goto(url) {
     await this.page.goto(url);
@@ -47,8 +47,8 @@ export class Scraper {
 
   /**
    * @description Waits for the specified time
-   * @returns {Promise<void>}
    * @param {number} time
+   * @returns {Promise<void>}
    */
   async sleep(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
@@ -56,8 +56,8 @@ export class Scraper {
 
   /**
    * @description Takes a screenshot of the current page
-   * @returns {Promise<void>}
    * @param {string} filename
+   * @returns {Promise<void>}
    */
   async takeScreenshot(filename) {
     await this.page.screenshot({ path: filename });
@@ -66,9 +66,9 @@ export class Scraper {
   /**
    * @description Verifies the login status, either by checking valid credentials
    *  or by looking for the "signed in" element
-   * @returns {Promise<void>}
    * @param {string} signedInPath
    * @param {string} invalidCredsPath
+   * @returns {Promise<void>}
    */
   async verifyLoginStatus(signedInPath, invalidCredsPath) {
     await this.sleep(1000);
@@ -107,14 +107,36 @@ export class Scraper {
   }
 
   /**
+   * @description Gets dropdown element and its options
    * @param {xpath} path
+   * @returns {Promise<[ElementHandle, string[]]>}
    */
-  async selectDropdownOption(path) {}
+  async getDropdownAndOptions(path) {
+    const [dropdown] = await this.page.$x(path);
+
+    const rawOptions = await dropdown.$$eval("option", (opts) =>
+      opts.map((option) => option.value)
+    );
+    const options = rawOptions.filter((option) => option);
+
+    return [dropdown, options];
+  }
 
   /**
-   *
+   * @description Get group of elements by xpath
+   * @param {xpath} path
+   * @returns {Promise<ElementHandle[]>}
+   */
+  async getGroupElements(path) {
+    const elements = await this.page.$x(path);
+
+    return elements;
+  }
+
+  /**
+   * @description Verifies the existence of an element
    * @param {*} param0
-   * @returns {ElementHandle}
+   * @returns {Promise<ElementHandle>}
    */
   async doesElementExist({ path, errMsg, shouldExist }) {
     const element = (await this.page.$x(path)) || [];

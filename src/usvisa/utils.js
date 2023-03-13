@@ -2,6 +2,19 @@ import config from "./vars.js";
 
 const baseScheduleUrl = `/es-mx/niv/schedule/${config.scheduleId}`;
 
+export const facilitiesCitiesMap = new Map([
+  ["JRZ", { con: "65", cas: "76" }],
+  ["GDL", { con: "66", cas: "77" }],
+  ["HMO", { con: "67", cas: "78" }],
+  ["MTM", { con: "68", cas: "79" }],
+  ["MRD", { con: "69", cas: "81" }],
+  ["CDX", { con: "70", cas: "82" }],
+  ["MTY", { con: "71", cas: "83" }],
+  ["NGL", { con: "72", cas: "84" }],
+  ["NLD", { con: "73", cas: "85" }],
+  ["TJN", { con: "74", cas: "88" }],
+]);
+
 export const xpaths = {
   // login
   usernameInput: '//input[@id="user_email"]',
@@ -28,6 +41,9 @@ export const xpaths = {
   casAppoinmentDatepicker: '//input[@id="appointments_asc_appointment_date"]',
   casAppoinmentTimeDropdown:
     '//select[@id="appointments_asc_appointment_time"]',
+  reScheduleAppointmentButton: '//input[@id="appointments_submit"]',
+  // datepicker
+  datepickerAvailableDay: '//td[@data-handler="selectDay"]',
   datepickerNextMonthButton: '//a[@data-handler="next"]',
   datepickerPreviousMonthButton: '//a[@data-handler="prev"]',
 };
